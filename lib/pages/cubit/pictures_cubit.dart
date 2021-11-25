@@ -13,6 +13,7 @@ class PicturesCubit extends Cubit<PicturesState> {
 
   Future<void> loadPictures() async {
     try {
+      model.clearPictureList();
       // await Future.delayed(const Duration(seconds: 3));
       await model.loadPage();
       // if (model.pictures.isEmpty) return;
@@ -22,15 +23,16 @@ class PicturesCubit extends Cubit<PicturesState> {
     }
     return;
   }
-  // Future<void> addPicture() async {
-  //   try {
-  //     // await Future.delayed(const Duration(seconds: 3));
-  //     await model.addNextPage();
-  //     // if (model.pictures.isEmpty) return;
-  //     emit(PicturesLoadedState(model.pictures));
-  //   } on ApiClientException {
-  //     emit(PicturesErrorState('sorry we cant download news'));
-  //   }
-  //   return;
-  // }
+
+  Future<void> addPicture() async {
+    try {
+   //   emit(PicturesInitial());
+      // await Future.delayed(const Duration(seconds: 3));
+      await model.addNextPage();
+      // if (model.pictures.isEmpty) return;
+    } on ApiClientException {
+      emit(PicturesErrorState('sorry we cant download news'));
+    }
+    return;
+  }
 }

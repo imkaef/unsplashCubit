@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         body: const MainScreenPage(),
         appBar: AppBar(
           centerTitle: true,
-          title: Text('unsplash'),
+          title: const Text('Unsplash'),
         ),
       ),
     );

@@ -92,18 +92,18 @@ Widget picturesBuilder(BuildContext context, PicturesLoadedState state) {
     itemCount: state.pictures.length,
     itemBuilder: (context, index) {
       final item = state.pictures[index];
-      if (index == state.pictures.length-2) {
-        
+      if (index == state.pictures.length - 2) {
+        context.read<PicturesCubit>().addPicture();
       }
-      return PictureCard(
+      return _PictureCard(
         picture: item,
       );
     },
   );
 }
 
-class PictureCard extends StatelessWidget {
-  const PictureCard({Key? key, required this.picture}) : super(key: key);
+class _PictureCard extends StatelessWidget {
+  const _PictureCard({Key? key, required this.picture}) : super(key: key);
   final Picture picture;
   @override
   Widget build(BuildContext context) {
@@ -215,8 +215,8 @@ Widget _secondWidget() {
 BoxDecoration myBoxDecoration() {
   return const BoxDecoration(
     color: Colors.deepPurple,
-    borderRadius:
-        BorderRadius.all(Radius.circular(5.0) //         <--- border radius here
-            ),
+    borderRadius: BorderRadius.all(
+        Radius.circular(10.0) //         <--- border radius here
+        ),
   );
 }
