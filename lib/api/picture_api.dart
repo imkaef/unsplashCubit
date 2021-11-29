@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:unsplash_pictures_bloc/entitys/picture.dart';
 
-
-
 // перечисление ошибок
 enum ApiClientExceptionType { network, auth, other }
 
@@ -40,7 +38,6 @@ class ApiClient {
       final request = await _client.getUrl(url);
       final responce = await request.close();
       final dynamic json = (await responce.jsonDecode());
-      print(json);
       // _validateResponse(responce, json);
       final result = parser(json);
       return result;
@@ -58,7 +55,7 @@ class ApiClient {
     }
   }
 
-  Future<List<Picture>> getAllPicture() async {
+  Future<List<Picture>> getAllPicture(int page) async {
     // ignore: prefer_function_declarations_over_variables
     final parser = (dynamic json) {
       final jsonMap = json as List<dynamic>;
@@ -73,7 +70,8 @@ class ApiClient {
       parser: parser,
       parametrs: <String, dynamic>{
         'client_id': _clientId,
-        // 'page': page.toString(),
+        'page': page.toString(),
+        'per_page': 15.toString()
       },
     );
     return result;

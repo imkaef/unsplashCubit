@@ -7,49 +7,46 @@ import 'package:unsplash_pictures_bloc/entitys/picture.dart';
 class PictureListModel extends ChangeNotifier {
   final _apiClient = ApiClient();
   late var _pictures = <Picture>[];
+ // String? errorMessage = null;
 
-  var _totalPage;
+  // int _totalPage = 0;
 
-  var _currentPage;
+  var _currentPage = 0;
 
   bool _isLoadingInProgres = false;
   List<Picture> get pictures => List.unmodifiable(_pictures);
 
 // если квери не пустое то вы возвращем поиск фильмов, если пустое то выводим список фильмов
-  Future<List<Picture>> _loadPictures() async {
-    return _apiClient.getAllPicture();
+  Future<void> _loadPictures(int page) async {
+    final list = await _apiClient.getAllPicture(page);
+    _pictures.addAll(list);
   }
   // Future<List<Picture>> _loadPictures() async {
   //   return _apiClient.getAllPicture();
   // }
 
-  Future<void> loadPage() async {
-    _pictures = await _loadPictures();
-  }
-
-  Future<void> addNextPage() async {
-    final next = await _loadPictures();
-    _pictures.addAll(next);
-  }
-
   void clearPictureList() {
     _pictures = [];
+    _currentPage = 0;
   }
 
-  // Future<void> _loadNextPage() async {
-  //   if (_isLoadingInProgres || _currentPage >= _totalPage) return;
-  //   _isLoadingInProgres = !_isLoadingInProgres;
-  //   final _nextpage = _currentPage + 1;
-  //   try {
-  //     final responceMovies = await _loadMovies(_nextpage);
-  //     //если и будет ощиька то только сверху и поля ниже не выполнятся
-  //     _movies.addAll(responceMovies.movies);
-  //     _currentPage = responceMovies.page;
-  //     _totalPage = responceMovies.totalPages;
-  //     _isLoadingInProgres = !_isLoadingInProgres;
-  //     notifyListeners();
-  //   } catch (e) {
-  //     _isLoadingInProgres = !_isLoadingInProgres;
-  //   }
-  // }
+  Future<void> loadNextPage() async {
+    if (_isLoadingInProgres) return;
+    _isLoadingInProgres = !_isLoadingInProgres;
+    final _nextpage = _currentPage + 1;
+    try {
+      await _loadPictures(_nextpage);
+      //если и будет ощиька то только сверху и поля ниже не выполнятся
+      // _apiClient.getAllPicture(_nextpage);
+      _currentPage = _nextpage;
+      _isLoadingInProgres = !_isLoadingInProgres;
+      notifyListeners();
+    } on ApiClientException catch (e) {
+      // errorMessage = e.toString();
+      // print(errorMessage);
+      _isLoadingInProgres = !_isLoadingInProgres;
+      rethrow;
+    }
+  }
+
 }

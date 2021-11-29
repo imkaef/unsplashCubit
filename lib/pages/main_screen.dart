@@ -24,11 +24,11 @@ class _ListPictureWidget extends StatelessWidget {
     return BlocBuilder<PicturesCubit, PicturesState>(
       builder: (context, state) {
         if (state is PicturesInitial) {
-          context.read<PicturesCubit>().loadPictures();
+          context.read<PicturesCubit>().internial();
           return const _DownloadWidget();
         }
         if (state is PicturesLoadedState) {
-          context.read<PicturesCubit>().loadPictures();
+          // context.read<PicturesCubit>().loadPictures();
           return _LoadedWidget(
             state: state,
           );
@@ -52,11 +52,24 @@ class _ErrorWidget extends StatelessWidget {
   final PicturesErrorState state;
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
+    return Padding(
+      padding: const EdgeInsets.only(top: 20.0),
+      child: Container(
         child: Center(
-          child: Text(state.errorMessage),
+          child: Column(
+            children: [
+              Center(child: Text(state.errorMessage)),
+              Center(
+                child: IconButton(
+                  onPressed: () => context.read<PicturesCubit>().resetPicture(),
+                  icon: Icon(Icons.refresh),
+                ),
+              ),
+            ],
+          ),
         ),
-        onRefresh: () => context.read<PicturesCubit>().loadPictures());
+      ),
+    );
   }
 }
 
@@ -70,7 +83,7 @@ class _LoadedWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
         child: picturesBuilder(context, state),
-        onRefresh: () => context.read<PicturesCubit>().loadPictures());
+        onRefresh: () => context.read<PicturesCubit>().resetPicture());
   }
 }
 
@@ -96,6 +109,7 @@ Widget picturesBuilder(BuildContext context, PicturesLoadedState state) {
         context.read<PicturesCubit>().addPicture();
       }
       return _PictureCard(
+        index: index,
         picture: item,
       );
     },
@@ -103,8 +117,10 @@ Widget picturesBuilder(BuildContext context, PicturesLoadedState state) {
 }
 
 class _PictureCard extends StatelessWidget {
-  const _PictureCard({Key? key, required this.picture}) : super(key: key);
+  const _PictureCard({Key? key, required this.picture, required this.index})
+      : super(key: key);
   final Picture picture;
+  final int index;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -130,19 +146,19 @@ class _PictureCard extends StatelessWidget {
                         child: CircleAvatar(
                           radius: 20.0,
                           backgroundImage: NetworkImage(
-                              '${picture.user.profileImage?.large}'),
+                              '${picture.user.profileImage?.medium}'),
                           backgroundColor: Colors.transparent,
                         ),
                       )
                     : const SizedBox.shrink(),
                 Text(
-                  '${picture.user.firstName} ${picture.user.lastName}',
+                  '${picture.user.name}',
                   style: const TextStyle(fontSize: 12),
                 ),
               ],
             ),
-            picture.urls?.regular != null
-                ? Image.network(picture.urls!.regular)
+            picture.urls?.small != null
+                ? Image.network(picture.urls!.small)
                 : const SizedBox.shrink(),
             // Image.network(picture.urls.full)
             Row(
@@ -160,14 +176,14 @@ class _PictureCard extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () => {},
-                        child: const Text('Download'),
+                        child: const Text('download'),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            _secondWidget(),
+            _secondWidget(index.toString()),
           ],
         ),
       ),
@@ -175,7 +191,7 @@ class _PictureCard extends StatelessWidget {
   }
 }
 
-Widget _secondWidget() {
+Widget _secondWidget(index) {
   return InkWell(
       onTap: () {},
       child: Card(
@@ -197,12 +213,12 @@ Widget _secondWidget() {
                     color: Colors.white,
                   ),
                 )),
-            const Expanded(
+            Expanded(
                 flex: 3,
                 child: Padding(
                     padding: EdgeInsets.only(left: 15),
                     child: Text(
-                      'Settings',
+                      index,
                       style: TextStyle(
                         fontSize: 25,
                       ),

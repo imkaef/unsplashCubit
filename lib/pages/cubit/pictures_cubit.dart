@@ -11,27 +11,42 @@ class PicturesCubit extends Cubit<PicturesState> {
 
   final model = PictureListModel();
 
-  Future<void> loadPictures() async {
+  Future<void> internial() async {
     try {
-      model.clearPictureList();
+      //   emit(PicturesInitial());
       // await Future.delayed(const Duration(seconds: 3));
-      await model.loadPage();
-      // if (model.pictures.isEmpty) return;
+      await model.loadNextPage();
       emit(PicturesLoadedState(model.pictures));
+      // if (model.pictures.isEmpty) return;
     } on ApiClientException {
-      emit(PicturesErrorState('sorry we cant download news'));
+      emit(PicturesErrorState('addPicture sorry we cant download news'));
     }
     return;
   }
 
   Future<void> addPicture() async {
     try {
-   //   emit(PicturesInitial());
+      //   emit(PicturesInitial());
       // await Future.delayed(const Duration(seconds: 3));
-      await model.addNextPage();
+      await model.loadNextPage();
+      emit(PicturesLoadedState(model.pictures));
       // if (model.pictures.isEmpty) return;
     } on ApiClientException {
-      emit(PicturesErrorState('sorry we cant download news'));
+      emit(PicturesErrorState('addPicture sorry we cant download news'));
+    }
+    return;
+  }
+
+  Future<void> resetPicture() async {
+    try {
+      //  model.clearPictureList();
+      // await Future.delayed(const Duration(seconds: 3));
+      model.clearPictureList();
+      await model.loadNextPage();
+      // if (model.pictures.isEmpty) return;
+      emit(PicturesLoadedState(model.pictures));
+    } on ApiClientException {
+      emit(PicturesErrorState('resetPicture sorry we cant download news'));
     }
     return;
   }
