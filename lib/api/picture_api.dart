@@ -55,6 +55,45 @@ class ApiClient {
     }
   }
 
+  Future<T> _post<T>(
+    String path,
+    Map<String, dynamic> bodyParametrs,
+    T Function(dynamic json) parser, [
+    Map<String, dynamic>? urlParametrs,
+  ]) async {
+    try {
+      final url = _makeUri(path, urlParametrs);
+      final request = await _client.postUrl(
+        url,
+      );
+      request.headers.contentType = ContentType.json;
+      request.write(jsonEncode(bodyParametrs));
+      final responce = await request.close();
+      final dynamic json = (await responce.jsonDecode());
+      _validateResponse(responce, json);
+      final result = parser(json);
+      return result;
+    } on SocketException {
+      throw ApiClientException(ApiClientExceptionType.network);
+    } on ApiClientException {
+      rethrow;
+    } catch (_) {
+      throw ApiClientException(ApiClientExceptionType.other);
+    }
+  }
+
+  void _validateResponse(HttpClientResponse responce, dynamic json) {
+    if (responce.statusCode == 401) {
+      final dynamic status = json['status_code'];
+      final code = status is int ? status : 0;
+      if (code == 30) {
+        throw ApiClientException(ApiClientExceptionType.auth);
+      } else {
+        throw ApiClientException(ApiClientExceptionType.other);
+      }
+    }
+  }
+
   Future<List<Picture>> getAllPicture(int page) async {
     // ignore: prefer_function_declarations_over_variables
     final parser = (dynamic json) {

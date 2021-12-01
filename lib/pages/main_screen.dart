@@ -62,7 +62,8 @@ class _ErrorWidget extends StatelessWidget {
               Center(
                 child: IconButton(
                   onPressed: () => context.read<PicturesCubit>().resetPicture(),
-                  icon: Icon(Icons.refresh),
+                  //Сделать покрасивее
+                  icon: const Icon(Icons.refresh),
                 ),
               ),
             ],
